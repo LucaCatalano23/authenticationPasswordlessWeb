@@ -27,13 +27,15 @@ def register():
         
         if username in registered_credentials:
             return jsonify({'error': 'Utente già registrato.'}), 500
-        # Generare le opzioni di registrazione per il client authenticator_selection
-        # è un attributo opzinale ma l'ho inserito per definire meglio l'authenticator 
+        # Generare le opzioni di registrazione per il client. 
+        # Authenticator_selection è un attributo opzionale
+        # per definire meglio l'authenticator
         options = generate_registration_options(rp_id="localhost", 
                                                 rp_name="example",
                                                 user_name=username, 
-                                                authenticator_selection=AuthenticatorSelectionCriteria(authenticator_attachment=AuthenticatorAttachment.PLATFORM,
-                                                                                                       resident_key=ResidentKeyRequirement.PREFERRED))
+                                                authenticator_selection=AuthenticatorSelectionCriteria(
+                                                    resident_key=ResidentKeyRequirement.REQUIRED,
+                                                    user_verification=UserVerificationRequirement.PREFERRED))
         # Convertire le opzioni in JSON in quanto ci sono oggetti bytes che non possono essere serializzati
         json_options = options_to_json(options)
         
@@ -68,8 +70,8 @@ def complete_registration():
 def authenticate():
     try:
         # Generare le opzioni di autenticazione per il client
-        options = generate_authentication_options(rp_id='example.com',
-                                                  user_verification=UserVerificationRequirement.REQUIRED)
+        options = generate_authentication_options(rp_id='localhost',
+                                                  user_verification=UserVerificationRequirement.PREFERRED)
 
         # Convertire le opzioni in JSON in quanto ci sono oggetti bytes che non possono essere serializzati
         json_options = options_to_json(options)
